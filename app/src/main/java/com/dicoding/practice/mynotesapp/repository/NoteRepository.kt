@@ -9,9 +9,9 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class NoteRepository (application: Application) {
+
     private val notesDao: NoteDao
     private val executorService: ExecutorService = Executors.newSingleThreadExecutor()
-
 
     init {
         val db = NoteDatabase.getDatabase(application)
