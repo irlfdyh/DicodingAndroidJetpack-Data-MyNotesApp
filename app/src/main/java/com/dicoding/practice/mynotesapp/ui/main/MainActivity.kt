@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.practice.mynotesapp.NoteAdapter
+import com.dicoding.practice.mynotesapp.NotePagedListAdapter
 import com.dicoding.practice.mynotesapp.R
 import com.dicoding.practice.mynotesapp.database.Note
 import com.dicoding.practice.mynotesapp.ui.ViewModelFactory
@@ -16,7 +18,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var adapter: NoteAdapter
+    private lateinit var adapter: NotePagedListAdapter
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +28,7 @@ class MainActivity : AppCompatActivity() {
         viewModel = obtainViewModel(this)
         viewModel.getAllNotes().observe(this, noteObserver)
 
-        adapter = NoteAdapter(this@MainActivity)
+        adapter = NotePagedListAdapter(this@MainActivity)
         rv_notes.layoutManager = LinearLayoutManager(this)
         rv_notes.setHasFixedSize(true)
         rv_notes.adapter = adapter
@@ -55,9 +57,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val noteObserver = Observer<List<Note>> { noteList ->
+    private val noteObserver = Observer<PagedList<Note>> { noteList ->
         if (noteList != null) {
-            adapter.setListNotes(noteList)
+            adapter.submitList(noteList)
         }
     }
 
