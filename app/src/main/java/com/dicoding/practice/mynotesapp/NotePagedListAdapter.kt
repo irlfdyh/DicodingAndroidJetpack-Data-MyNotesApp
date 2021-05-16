@@ -34,7 +34,9 @@ class NotePagedListAdapter constructor(
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(getItem(position) as Note)
+        getItem(position)?.let {
+            holder.bind(it)
+        }
     }
 
     inner class NoteViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView) {
