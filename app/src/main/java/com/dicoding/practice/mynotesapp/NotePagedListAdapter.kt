@@ -5,24 +5,27 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.dicoding.practice.mynotesapp.database.Note
-import com.dicoding.practice.mynotesapp.helper.NoteDiffCallback
 import com.dicoding.practice.mynotesapp.ui.insert.NoteAddUpdateActivity
 import kotlinx.android.synthetic.main.item_note.view.*
 
-class NoteAdapter constructor(
+class NotePagedListAdapter constructor(
     private val activity: Activity
-): RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
+) : PagedListAdapter<Note, NotePagedListAdapter.NoteViewHolder>(DIFF_CALLBACK) {
 
-    private val listNotes = ArrayList<Note>()
-    fun setListNotes(listNotes: List<Note>) {
-        val diffCallback = NoteDiffCallback(this.listNotes, listNotes)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        this.listNotes.clear()
-        this.listNotes.addAll(listNotes)
-        diffResult.dispatchUpdatesTo(this)
+    companion object {
+        private val DIFF_CALLBACK: DiffUtil.ItemCallback<Note> = object : DiffUtil.ItemCallback<Note>() {
+            override fun areItemsTheSame(oldItem: Note, newItem: Note): Boolean {
+                return oldItem.title == newItem.title
+            }
+            override fun areContentsTheSame(oldItem: Note, newItem: Note): Boolean {
+                return oldItem == newItem
+            }
+
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
@@ -30,17 +33,13 @@ class NoteAdapter constructor(
         return NoteViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return listNotes.size
-    }
-
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(listNotes[position])
+        getItem(position)?.let {
+            holder.bind(it)
+        }
     }
 
-    inner class NoteViewHolder(
-        itemView: View
-    ): RecyclerView.ViewHolder(itemView) {
+    inner class NoteViewHolder (itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(note: Note){
             with(itemView){
                 tv_item_title.text = note.title

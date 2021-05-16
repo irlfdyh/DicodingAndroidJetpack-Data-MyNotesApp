@@ -1,7 +1,8 @@
 package com.dicoding.practice.mynotesapp.database
 
-import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 
 @Dao
 interface NoteDao {
@@ -15,6 +16,10 @@ interface NoteDao {
     @Delete
     fun delete(note: Note)
 
-    @Query("SELECT * FROM note ORDER BY id ASC")
-    fun getAllNotes(): LiveData<List<Note>>
+    @RawQuery(observedEntities = [Note::class])
+    fun getAllNotes(query: SupportSQLiteQuery): DataSource.Factory<Int, Note>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun bulkInsert(list: List<Note>)
+
 }

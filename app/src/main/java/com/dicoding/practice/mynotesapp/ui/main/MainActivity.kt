@@ -3,12 +3,18 @@ package com.dicoding.practice.mynotesapp.ui.main
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.practice.mynotesapp.NoteAdapter
+import com.dicoding.practice.mynotesapp.NotePagedListAdapter
 import com.dicoding.practice.mynotesapp.R
 import com.dicoding.practice.mynotesapp.database.Note
+import com.dicoding.practice.mynotesapp.helper.SortUtils
 import com.dicoding.practice.mynotesapp.ui.ViewModelFactory
 import com.dicoding.practice.mynotesapp.ui.insert.NoteAddUpdateActivity
 import com.google.android.material.snackbar.Snackbar
@@ -16,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var adapter: NoteAdapter
+    private lateinit var adapter: NotePagedListAdapter
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,9 +30,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel = obtainViewModel(this)
-        viewModel.getAllNotes().observe(this, noteObserver)
+        viewModel.getAllNotes(SortUtils.NEWEST).observe(this, noteObserver)
 
-        adapter = NoteAdapter(this@MainActivity)
+        adapter = NotePagedListAdapter(this@MainActivity)
         rv_notes.layoutManager = LinearLayoutManager(this)
         rv_notes.setHasFixedSize(true)
         rv_notes.adapter = adapter
@@ -55,9 +61,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private val noteObserver = Observer<List<Note>> { noteList ->
-        if (noteList != null) {
-            adapter.setListNotes(noteList)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var sort = ""
+        when (item.itemId) {
+            R.id.action_newest -> sort = SortUtils.NEWEST
+            R.id.action_oldest -> sort = SortUtils.OLDEST
+            R.id.action_random -> sort = SortUtils.RANDOM
+        }
+        viewModel.getAllNotes(sort).observe(this, noteObserver)
+        item.isChecked = true
+        return super.onOptionsItemSelected(item)
+    }
+
+    private val noteObserver = Observer<PagedList<Note>> { noteList ->
+        if (noteList != null && noteList.isNotEmpty()) {
+            adapter.submitList(noteList)
         }
     }
 
