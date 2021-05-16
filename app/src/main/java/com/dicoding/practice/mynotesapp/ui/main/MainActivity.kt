@@ -11,6 +11,7 @@ import com.dicoding.practice.mynotesapp.NoteAdapter
 import com.dicoding.practice.mynotesapp.NotePagedListAdapter
 import com.dicoding.practice.mynotesapp.R
 import com.dicoding.practice.mynotesapp.database.Note
+import com.dicoding.practice.mynotesapp.helper.SortUtils
 import com.dicoding.practice.mynotesapp.ui.ViewModelFactory
 import com.dicoding.practice.mynotesapp.ui.insert.NoteAddUpdateActivity
 import com.google.android.material.snackbar.Snackbar
@@ -26,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel = obtainViewModel(this)
-        viewModel.getAllNotes().observe(this, noteObserver)
+        viewModel.getAllNotes(SortUtils.NEWEST).observe(this, noteObserver)
 
         adapter = NotePagedListAdapter(this@MainActivity)
         rv_notes.layoutManager = LinearLayoutManager(this)

@@ -12,7 +12,7 @@ class MainViewModel (application: Application) : ViewModel() {
 
     private val _repository: NoteRepository = NoteRepository(application)
 
-    fun getAllNotes(): LiveData<PagedList<Note>>
-            = LivePagedListBuilder(_repository.getAllNotes(), 20).build()
+    fun getAllNotes(sort: String): LiveData<PagedList<Note>>
+            = LivePagedListBuilder(_repository.getAllNotes(sort), 20).build()
 
 }
